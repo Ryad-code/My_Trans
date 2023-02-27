@@ -1,0 +1,88 @@
+version: '3.9'
+
+#===============================BACKEND_CONTAINER
+services:
+
+  backend:
+    container_name: backend
+
+    build:
+      context: backend/.
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - backend:/app/
+
+    networks:
+      - transcendance
+
+    env_file: .env
+
+    depends_on:
+      - postgresql
+#============================FRONTEND_CONTAINER
+  frontend:
+    container_name: frontend
+    
+    build:
+      context: frontend/.
+
+    ports:
+      - "3002:3000"
+
+    volumes:
+      - frontend:/app
+
+    networks:
+      - transcendance
+
+    env_file: .env
+
+    depends_on:
+      - backend
+#============================POSTGRESQL_CONTAINER
+  postgresql:
+    image: postgres:latest
+
+    container_name: postgresql
+
+    volumes:
+      - postgresql:/var/lib/postresql/data
+
+    networks:
+      - transcendance
+
+    env_file: .env
+
+#============================VOLUMES
+volumes:
+  
+  backend:
+    driver: local
+    driver_opts:
+      type:   'none'
+      o:      'bind'
+      device: "$PWD/backend/srcs"
+
+  postgresql:
+    #    driver: local
+    #driver_opts:
+    #  type:   'none'
+    #  o:      'bind'
+    #  device: "$PWD/volumes/postgresql_volume"
+
+  frontend:
+    driver: local
+    driver_opts:
+      type:   'none'
+      o:      'bind'
+      device: "$PWD/frontend/srcs"
+
+#============================NETWORK
+networks:
+
+  transcendance:
+    driver: bridge
+
